@@ -1,0 +1,4 @@
+labels lbound ubound
+Low    0.0      1
+Mid    0.1      2
+High    0.2      3

@@ -1,0 +1,1 @@
+This folder includes examples from the book R Cookbook by Paul Teetor
