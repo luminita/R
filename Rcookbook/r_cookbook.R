@@ -387,7 +387,69 @@ d1 <- data.frame(c1=c(1,2,3), c2=c(4, 5, 6))
 with(d1, c1+c2 - mean(c1))
 
 
+####################### CHAPTER 6: Data transformations 
+## 6.1 Splitting a vector into groups 
+# returns a list of vectors, each vector corresponding to a group 
+v <- c(1, 2, 3, 4)
+f <- factor(c("A", "A", "B", "B"))
+groups1<-split(v, f)
+# if all the vectors have the same length it returns a data frame 
+groups2<-unstack(data.frame(v, f))
+class(groups2)
 
+## 6.2 Applying a function to each list element 
+l <- list(c(1, 2, 3, 4))
+f <- function(x) {return (x+1);}
+# lapply returns the result in a list 
+# sapply returns the result in a vector, a matrix or a list (depending on 
+# what the function returns)
+r1 <- lapply(l, f)
+r2 <- sapply(l, f)
 
+## 6.3-6.4 Applying a function to every row/column of a matrix or data frame 
+m <- matrix(1:6, 3, 2)
+d <- data.frame(one=c(1, 2, 3), two=10:12)
+rownames(m)<-c("One", "Two", "Three")
+colnames(m)<-c("Uno", "Dos")
+f <- function(x) {return(sum(x))}
+# apply the function to every row of m (this works )
+r <- apply(m, 1, f)
+r
+r <- apply(d, 1, f)
+r
+# apply the function to every column of a matrix  
+c <- apply(m, 2, f)
+c
+c <- apply(d, 2, f)
+c
+c <- lapply(d, f)
+c
+# cool recipe to find the 10 predictors with best correlation with a
+# response variable and use them to run linear regression 
+# cor is the function applied, y=resp is passed as second argument to the function 
+# cors <- sapply(pred, cor, y=resp)
+# mask <- (rank(-abs(cors)) <= 10)
+# pred <- pred[,mask]
+# r <- lm(resp ~ pred)
 
+## 6.5 Apply a function to groups of data 
+# you first need to create a grouping factor, then use tapply 
+v <- c(1:3, 100:101)
+fa <- factor(c("Group1", "Group1", "Group1", "Group2", "Group2"))
+tapply(v, fa, sum)
+fun <- function(x) {return (c(mean(x), sd(x)))}
+tapply(v, fa, fun)
+
+## 6.6 Apply a function to group of rows of rows in a data frame 
+# you need to create a factor that groups your rows, then use by 
+# note that the paramater of the function is a data frame! 
+# (by rearranges data in a data frame)
+library(MASS)
+by(Aids2, Aids2$sex, summary)
+
+## 6.7 Applying a function to parallel vectors or lists 
+v1 <- c(-1, 2, -3)
+v2 <- 10:12
+fun <- function(x1, x2) {return(x1*x2)}
+mapply(fun, v1, v2)
 
