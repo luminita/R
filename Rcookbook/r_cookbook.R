@@ -519,3 +519,59 @@ seq(from=s, to=e, by="month")
 seq(from=s, to=e, by="3 months")
 
 
+####################### CHAPTER 8: Probability
+# dnorm: density function
+# pnorm: distribution function
+# qnorm: quantile function 
+# rnorm: random variables 
+# help about a distribution 
+?Normal
+# 8.1 How many combinations of n items taken k at a time (binomial coefficients)  
+choose(3, 2)
+
+# 8.2 Generate all combinations of n items taken k at a time 
+combn(c("A", "B", "C"), 2)
+
+# 8.3 Generate random numbers 
+# uniform between 0 and 1 
+runif(5)
+# standard normal distribution 
+rnorm(5)
+rnorm(4, mean=c(1, 20), sd=c(1, 1))
+
+# 8.5 Generate a random sample 
+# sample w/wo replacement 
+sample(1:10, 5)
+sample(1:10, 5, replace=TRUE)
+# generate a sequence of Bernoulli trials with p = 0.3
+sample(c(TRUE, FALSE), 20, replace=TRUE, prob=c(0.3, 0.7))
+
+# 8.7 Randomly permuting a vector 
+sample(1:10)
+
+# 8.8  Calculating probabilities  
+# P(X=x) -> use the density function (eg dnorm)
+# For P(X<=x) -> use the probability function (eg pnorm) 
+dnorm(0.0)
+pnorm(0.0)
+pnorm(0.5)
+# the survival function P(X>x)
+pnorm(0.5, lower.tail=FALSE)
+# how many data points are within 2 standard deviations from the mean? 
+pnorm(2.0) - pnorm(-2.0)
+
+# 8.10 Converting probabilities to quantiles 
+# Giving a probability p and a distribution, we want to find out x such as P(X<=x) = p
+pnorm(2.0)
+qnorm(0.97725)
+# see the extremities of a 95% interval 
+qnorm(c(0.025, 0.975))
+
+# 8.11 Plotting a density function 
+x <- seq(-3, 3, by=0.01)
+fx <- dnorm(x)
+plot(x, fx, type='l')
+# fill the region for X > 2
+region.x <- c(2, x[x>2], 3)
+region.y <- c(0, fx[x>2], 0)
+polygon(region.x, region.y, density = -1, col="blue")
