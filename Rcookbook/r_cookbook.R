@@ -453,3 +453,69 @@ v2 <- 10:12
 fun <- function(x1, x2) {return(x1*x2)}
 mapply(fun, v1, v2)
 
+
+####################### CHAPTER 7: Strings and Dates 
+help(DateTimeClasses)
+## 7.1-7.7 String operations 
+s <- "Lumi"
+vs <- c(s, "Mihaela")
+# length of a string: nchar. The length function returns the length of a vector! 
+nchar(s)
+nchar(vs)
+# concatenate strings 
+paste(vs[1], vs[2], sep=".")
+paste(vs, "is", "happy")
+paste(vs, "is", "happy", collapse = " and ")
+# extract substrings 
+substr(s, 1, 2)
+substr(vs, 1, 2)
+# note that all arguments of substr can be vectors 
+substr(vs, c(1, 6), c(2, 8))
+# splitting a string 
+s <- "Anna is 30 years old"
+s2 <- "Mary is young, is she?"
+r <- strsplit(c(s, s2), " ")
+r
+class(r)
+# replacing substrings
+# first instance 
+sub("is","isnt", s2)
+# all instances 
+gsub("is","isnt", s2)
+# generate pairwise combinations of strings as a matrix
+# outer calculates outer product, but you can replace multiplication with some 
+# other function eg paste; the last parameter is passed to the function 
+s1 <- c("A", "B", "C")
+s2 <- c("D", "E")
+outer(s1, s2, paste, sep="+")
+
+## 7.8 - .. Dates processing 
+# current data 
+Sys.Date()
+# convert string to a date 
+as.Date("2012-06-12", format="%Y-%m-%d")
+# convert a Date to a string 
+format(Sys.Date(), format="%d-%m-%Y")
+as.character(Sys.Date())
+# create a date from parts (note that the parameters can also be vectors!)
+# use IDODatetime if you want to have also time
+as.Date(ISOdate(2015, 07, 29))
+# get the julian date (number of days since 1.01.1970)
+as.integer(Sys.Date())
+julian(Sys.Date())
+# extract parts of a date 
+d<-as.Date("1982-09-18")
+p<-as.POSIXlt(d)
+p$mday
+p$mon # Jan is 0
+p$year + 1900
+p$wday
+# create a sequence of dates 
+s<-as.Date("1982-09-18")
+e<-as.Date("1983-09-18")
+seq(from=s, to=e, by=7)
+seq(from=s, to=e, length.out=10)
+seq(from=s, to=e, by="month")
+seq(from=s, to=e, by="3 months")
+
+
