@@ -1,0 +1,12 @@
+A/B testing 
+-----------
+- Generalities
+  * an A/B test need to have a defined outcome that is measurable such as number of sales 
+  made, click-rate conversion etc 
+  * one treatment may be more successfull within a certain customer segment even if it 
+  performs worse otherwise 
+- Comparing means 
+  * use Student t-test or Welch's t test (less assumptions)
+- Comparing two binomial distributions 
+  * use Fisher's exact test 
+
