@@ -562,8 +562,8 @@ pnorm(2.0) - pnorm(-2.0)
 
 # 8.10 Converting probabilities to quantiles 
 # Giving a probability p and a distribution, we want to find out x such as P(X<=x) = p
-pnorm(2.0)
 qnorm(0.97725)
+# to check: pnorm(2.0)
 # see the extremities of a 95% interval 
 qnorm(c(0.025, 0.975))
 
@@ -575,3 +575,148 @@ plot(x, fx, type='l')
 region.x <- c(2, x[x>2], 3)
 region.y <- c(0, fx[x>2], 0)
 polygon(region.x, region.y, density = -1, col="blue")
+
+
+####################### CHAPTER 9: General Statistics
+## 9.1 Summarize data 
+v <- 1:11
+summary(v)
+# The summary of a factor returns counts 
+fa <- factor(c(1, 2, 1, 2, 3, 1))
+summary(fa)
+# The summary of a data frame works by column, and gives counts for factor
+# columns and a statistical summary for numeric ones 
+d <- data.frame(col1=1:5, col2=c("A", "B", "A", "A", "C"))
+summary(d)
+# for a list you need to use lapply 
+l <- list(c1=1:10, c2=100:110)
+lapply(l, summary)
+
+## 9.2 Calculating relative frequencies 
+v <- 1:10
+mean(v>2)
+# fraction of observations that exceed two standard deviations from the mean 
+v <- rnorm(100)
+mean(abs(v-mean(v)) > 2*sd(v))
+
+## 9.3 Tabulating factors and creating contingency tables 
+fa1 <- factor(c("A", "B", "A", "A", "C"))
+fa2 <- factor(c("Z", "B", "X", "X", "Z"))
+table(fa1, fa2)
+
+## 9.4 Testing categorical variables for independence 
+# use a chi-squared test 
+fa1 <- factor(c("A", "B", "A", "A", "C", "A", "D", "A"))
+fa2 <- factor(c("Z", "B", "X", "X", "Z", "X", "V", "X"))
+summary(table(fa1, fa2))
+
+## 9.5 Calculate quantiles 
+# find v such as the fraction of observations below v is f
+v <- 1:100 
+quantile(v, c(0.25, 0.75))
+# find quartiles 
+quantile(v)
+
+## 9.6 Inverting quantiles 
+# given an observation x find its quantile 
+v <- 1:100 
+x <- 5
+mean(v < x)
+
+## 9.7 Normalize data 
+v <- 1:100 
+z1 <- scale(v)
+z2 <- (v - mean(v))/sd(v)
+
+## 9.8 Test the mean of a sample (t test)
+# Given a sample, test if the mean can be mu (mu is the null hypothesis)
+# !If n<30, this gives meaningful results only if the population is normally distributed
+s <- rnorm(100)
+t.test(s, mu=1.0)
+
+## 9.9 Calculating a confidence interval for the mean 
+# !If n<30, this gives meaningful results only if the population is normally distributed
+s <- rnorm(100)
+t.test(s)
+t.test(s, conf.level=0.99)
+
+## 9.10 Calculating a confidence interval for the median 
+s <- rnorm(100)
+wilcox.test(s, conf.int=TRUE, conf.level=0.99)
+
+## 9.11 Testing a sample proportion 
+# assume that we have a sample of n trials with x successes; we want to test whether 
+# the probability of success is p 
+prop.test(1000, 1900, 0.51)
+# one tailed test 
+prop.test(1000, 1900, 0.5, alternative="greater")
+
+## 9.12 Confidence interval for a proportion 
+# 1000 successes out of 1900 trials 
+prop.test(1000, 1900, conf.level=0.99)
+
+## 9.13 Testing for normality 
+# Use the shapiro test; if p<0.05 -> not normally distributed, otherwise is 
+s <- rnorm(100)
+shapiro.test(s)
+s <- rt(1000, 3)
+
+## 9.14 Testing if a sequence of binary values are random 
+# done by applying a so-called runs test for randomness 
+# if pvalue < 0.05 -> the sequence is probably not random 
+v <- factor(sample(c(0, 1), 100, replace=TRUE))
+#install.packages("tseries")
+library(tseries)
+runs.test(v)
+
+## 9.15 Comparing the means of two samples 
+# if one the samples has less than 20 data points -> populations must be normally distributed
+s1 <- rnorm(100, mean=100, sd=10)
+s2 <- rnorm(150, mean=101, sd=15)
+t.test(s1, s2, paired=FALSE)
+
+## 9.16 Comparing the locations of two samples non-parametrically 
+# Assumption: the two populations have the same shape
+s1 <- rpois(100, 5)
+s2 <- rpois(150, 6)
+wilcox.test(s1, s2, paired=FALSE)
+
+## 9.17 Testing a correlation for significance 
+# if p < 0.05, they are most probably correlated 
+s1<-rnorm(100)
+s2<-s1 + rnorm(100)
+# if s1 and s2 come from normally distributed populations  
+cor.test(s1, s2)
+# if s1 and s2 DID not come from normally distributed populatons
+cor.test(s1, s2, method="spearman")
+
+## 9.18 Testing for equal proportions 
+# if p < 0.05, they are most probably not equal proportions 
+# you can have several groups 
+# eg if 3 groups, all with 100 trials but diff number of success 
+prop.test(c(45, 49, 77), c(100, 100, 100))
+
+## 9.19 Perform pairwise comparisons between group means 
+# giving a list of samples, you want to perform a pairwise comparison between all of them 
+# if p<0.05, probably the two groups have different means 
+s1 <- rnorm(100)
+s2 <- rnorm(50, mean=0.5, sd=3)
+s3 <- rnorm(150, mean=0.1, sd=1)
+# make a factor to identify the groups
+# ugly 
+fa <- factor(c(rep(c("A"), length(s1)), 
+               rep(c("B"), length(s2)), 
+               rep(c("C"), length(s3))))
+# elegant 
+data <- stack(list(A=s1, B=s2, C=s3))
+pairwise.t.test(c(s1, s2, s3), fa)
+pairwise.t.test(data$values, data$ind)
+
+## 9.20 Testing if two samples come from the same distribution 
+# use a Kolmogorov-Smirnov test (nonparametric)
+# if p < 0.05 the two samples are probably drawn from different distributions 
+s2 <- rnorm(50, mean=0.2, sd=6)
+s3 <- rnorm(150, mean=0.1, sd=10)
+ks.test(s2, s3)
+
+
