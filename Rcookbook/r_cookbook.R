@@ -720,3 +720,193 @@ s3 <- rnorm(150, mean=0.1, sd=10)
 ks.test(s2, s3)
 
 
+####################### CHAPTER 10: Graphics 
+# Two types of functions: high level and low level 
+# High level functions start a new graph (plot, boxplot, hist, qqnorm, curve)
+# Low level functions adds something to an existing graph (points, lines, abline, segments, 
+# polygon, text) --> you can use them after you initialized a graphic with a high level function 
+# Other useful packages for graphics: zoo for time series analysis, ggplot2 (prettier plots)
+#install.packages("ggplot2")
+#install.packages("zoo")
+#library(ggplot2)
+
+## 10.1-10.3 Scatter plot
+x<-runif(1000, min=10, max=20)
+y<-x + rnorm(1000)
+plot(x, y)
+d<-data.frame(c1=x, c2=y)
+plot(d, main="Scatter plot", xlab="X axis label", ylab="y axis label")
+# if you want to display a grid, you need to have type="n" to initialize 
+# the graphics frame without actually showing the data, then show the data points
+# (this avoids making the points less visible by drawing the grid in the end)
+plot(d, main="Scatter plot", xlab="X axis label", ylab="y axis label", type="n")
+grid()
+points(d, col="red")
+
+## 10.4-10.6 Scatter plot of multiple groups 
+# you have x, y and a factor f that shows in which group they are 
+x1<-runif(100, min=10, max=20)
+y1<-x1 + rnorm(100)
+x2<-runif(200, min=5, max=15)
+y2<--x2 + rnorm(200)
+fa <- factor(c(rep(c("A"), length(x1)), 
+               rep(c("B"), length(x2))))
+x<-c(x1, x2)
+y<-c(y1, y2)
+# pch allows to plot with a different character, it takes values between 0 and 18
+plot(x, y, pch=as.integer(fa))
+
+# legends
+# note that the first two parameters give the position in the coordinates of the 
+# displayed axes 
+# There are different formats of the function for legends for lines and colors
+legend(5, 20, c("Set 1", "Set 2"), pch=c(1, 2))
+
+# example from the book with legends
+library(MASS)
+fa<-factor(iris$Species)
+plot(iris$Petal.Length, iris$Petal.Width, pch=as.integer(fa))
+legend(1.0, 2.5, c(levels(fa)), pch=1:length(levels(fa)))
+
+## 10.6 Plot the regression line of a scatter plot
+x<-runif(1000, min=10, max=20)
+y<-x + rnorm(1000)
+# build a regression line 
+line <- lm(y ~ x)
+plot(y~x)
+# used to draw the line 
+abline(line)
+
+## 10.7 Plot pairwise scatter plots
+library(MASS)
+plot(iris[,1:4])
+
+## 10.8 Creating one scatter plot per factor level 
+x1<-runif(100, min=10, max=20)
+y1<-x1 + rnorm(100)
+x2<-runif(200, min=5, max=15)
+y2<--x2 + rnorm(200)
+fa <- factor(c(rep(c("A"), length(x1)), 
+               rep(c("B"), length(x2))))
+x<-c(x1, x2)
+y<-c(y1, y2)
+# pch allows to plot with a different character, it takes values between 0 and 18
+coplot(y~x|fa)
+
+## 10.9-10.11 Bar chart 
+library(MASS)
+heights <- tapply(Cars93$Price, Cars93$Type, mean)
+barplot(heights, ylab="Price", main="Price of cars by size")
+
+# add confidence intervals 
+#install.packages("gplots")
+library(gplots)
+heights <- tapply(Cars93$Price, Cars93$Type, mean)
+lower <- tapply(Cars93$Price, Cars93$Type, 
+                function(v) t.test(v,conf.level=0.95)$conf.int[1])
+upper <- tapply(Cars93$Price, Cars93$Type, 
+                function(v) t.test(v,conf.level=0.95)$conf.int[2])
+barplot2(heights, plot.ci=TRUE, ci.l=lower, ci.u=upper, 
+         main="Price of cars by size", xlab="Car Size", ylab="Price", 
+         ylim = c(0,40), xpd=FALSE)
+
+# add colors
+# create a vector of shades of gray depending on the size 
+rel.heights <- rank(heights)/(length(heights)*2)
+grays <- gray(1-rel.heights)
+barplot2(heights, plot.ci=TRUE, ci.l=lower, ci.u=upper, 
+         main="Price of cars by size", xlab="Car Size", ylab="Price", 
+         ylim = c(0,40), xpd=FALSE, col=grays)
+
+## 10.12-10.13 Plotting a line from data points 
+x <- 1:50
+y <- rnorm(50)
+z <- runif(50)
+plot(x, y, type="l", lty="solid", lwd=2.0, col="red")
+lines(x, z, type="l", lty="dotted", lwd=2.0, col="blue")
+points(x, y)
+
+## 10.14 Plotting multiple datasets 
+x <- 1:50
+y <- rnorm(50)
+z <- runif(50, 0, 5)
+# get the limits 
+ylim <- range(c(y, z))
+plot(x, y, type="l", lty="solid", lwd=2.0, col="red", ylim=ylim)
+lines(x, z, type="l", lty="dotted", lwd=2.0, col="blue")
+points(x, y)
+points(x, z)
+
+## 10.15 Adding vertical and horizontal lines 
+x<-seq(-3,3,by=0.1)
+y<-rnorm(length(x))
+m<-mean(y)
+stdevs<-m+c(-2, -1, 1, 2)*sd()
+plot(x, y)
+# horizontal
+abline(h=m)
+abline(h=stdevs, col=c("blue"), lty="dotted")
+# horizontal 
+abline(h=3)
+
+## 10.16-10.17 Creating a boxplot 
+x<-rnorm(100)
+# outliers are outside [Q1-1.5*IQR, Q3+1.5*IQR], IQR=Q3-Q1
+boxplot(x)
+# add factor 
+y<-rnorm(100, 1, 1)
+fa<-factor(c(rep(c("A"), 100), rep(c("B"), 100) ))
+boxplot(c(x,y)~fa)
+
+## 10.18-10.20 Create a histogram of the data 
+x<-rnorm(1000)
+hist(x, 50, prob=TRUE)
+# add a density line (necessary that prob=TRUE is given when initializing the plot)
+lines(density(x), lw=2.0)
+# create a discrete histogram 
+x<-rbinom(50, 100, 0.3)
+plot(table(x), type="h", lwd=5)
+
+
+## 10.21 Create a normal quantile quantile plot 
+x<-rnorm(100, 10, 4)
+qqnorm(x)
+qqline(x)
+
+## 10.22 Creating other qq plots 
+# Get a bunch of points between 0 and 1, use the quantile function for your 
+# distribution to calc quantiles, then plot these against the data 
+x<-rbinom(1000, 100, 0.3)
+points <- ppoints(length(x))
+tquantiles <-qbinom(points, 100, 0.3)
+sortedx <- sort(x)
+plot(tquantiles, sortedx)
+abline(a=0, b=1)
+
+## 10.23 Plot a variable in multiple colors 
+x<-rnorm(100)
+colors<-ifelse(x>=0, "blue", "red")
+plot(x, type="h", lwd=3, col=colors)
+
+## 10.24 Plot a function over some interval 
+curve(dnorm, -3, 3)
+
+## 10.26 Plot several plots in the same image 
+# divide the graphic in NXM
+par(mfrow=c(1, 2))
+curve(dnorm, -3, 3)
+curve(dnorm, -3, 3)
+
+## 10.28 Saving graphics in a file 
+png("Rgraph.png", width=1000, height=700)
+plot(rnorm(100), type="h")
+dev.off()
+
+## 10.29 Change default graphical parameters 
+# see the default value for a parameter 
+par("lwd")
+# make the default line width thicker 
+par(lwd=2)
+
+
+
