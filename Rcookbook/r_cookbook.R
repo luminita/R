@@ -896,6 +896,7 @@ curve(dnorm, -3, 3)
 par(mfrow=c(1, 2))
 curve(dnorm, -3, 3)
 curve(dnorm, -3, 3)
+par(mfrow=c(1, 1))
 
 ## 10.28 Saving graphics in a file 
 png("Rgraph.png", width=1000, height=700)
@@ -909,4 +910,291 @@ par("lwd")
 par(lwd=2)
 
 
+####################### CHAPTER 11: Linear Regression and ANOVA
+N = 10
+x <- 1:N
+
+## 11.1 Simple linear regression 
+y <- 2*x + 3 + rnorm(N)
+r<-lm(y~x)
+
+## 11.2-11.4 Multiple regression 
+u <- runif(N, min=10, max=100)
+v <- runif(N, min=10, max=100)
+epsilon <- rnorm(N)
+y <- -2*x + 1.5*v + 9.3*u + 5 + rnorm(N, 1, 2)
+r<-lm(y~x+v+u)
+
+# regression statistics 
+# coefficients 
+coef(r)
+# confidence intervals for the coefficients 
+confint(r)
+# residual sum of squares 
+deviance(r)
+# vector of orthogonal effects 
+effects(r)
+# vector of fitted y values 
+fitted(r)
+# residuals (y - fitted(y))
+residuals(r)
+# anova table
+anova(r)
+
+# get and understand the summary of multiple regression 
+summary(r)
+# Explanation of output 
+
+#>Residuals:
+#>  Min      1Q  Median      3Q     Max 
+#>-1.4115 -0.7099 -0.2625  1.0125  1.6348 
+# the residuals should always be normally distributed with the mean 0 
+# -> median should be 0, and 1Q and 3Q should have about the same abs 
+# -> min and max help detect outliers in the data (they usually produce large residuals)
+
+#>Coefficients:
+#>  Estimate Std. Error t value Pr(>|t|)    
+#>(Intercept) 11.08695    2.93884   3.773  0.00926 ** 
+#>  x           -1.98677    0.18412 -10.790 3.75e-05 ***
+#>  v            1.46338    0.02655  55.112 2.40e-09 ***
+#>  u            9.25244    0.01633 566.661 2.04e-15 ***
+# -> the column Estimate gives the coefficients 
+# -> the t statistic is given, together with the p-value showing 
+#    the probability that the coefficient is not significant 
+
+#>Multiple R-squared:      1,  Adjusted R-squared:      1 
+# -> R-squared is a measure of the models quality (fraction of variance in y explained 
+#    by the regression model);
+# -> Adjusted R accounts for the number of variables in the model and is more precise
+
+#>-statistic: 1.209e+05 on 3 and 6 DF,  p-value: 9.893e-15
+# -> tells whether the model is significant or not (one or more coefficients are 
+#   not 0) 
+
+## 11.5 Linear regression without an intercept 
+# you should first run regression with an intercept, see if it is 
+# plausible that the intercept is 0, then do this 
+N = 10
+x <- 1:N
+y <- 2*x + 3 + rnorm(N)
+lm(y~x+0)
+
+## 11.6 Linear regression with interaction terms 
+N = 10
+x <- 1:N
+u <- runif(N, min=10, max=100)
+v <- runif(N, min=10, max=100)
+epsilon <- rnorm(N)
+y <- -2*x + 9.3*u + 2.1*u*x + 7.2*u*v + 5 + rnorm(N, 1, 2)
+# takes all the combination of variables 
+r<-lm(y~x*u*v)
+summary(r)
+# include only some interactions 
+r<-lm(y ~ x + u + v + u:x + u:v)
+summary(r)
+# include all interactions of order 2 
+r<-lm(y ~ (x + u + v)^2)
+summary(r)
+
+
+## 11.7 Selecting the best regression variabes 
+N = 10
+x <- 1:N
+u <- runif(N, min=10, max=100)
+v <- runif(N, min=10, max=100)
+epsilon <- rnorm(N)
+y <- -2*x + 9.3*u + 5 + rnorm(N, 1, 2)
+full.model <- lm(y~x+u+v)
+summary(full.model)
+# reduce the model by stepwise removing variables 
+step(full.model, direction="backward")
+
+## 11.8 Regression on a subset of data 
+N = 10
+x <- 1:N
+u <- runif(N, min=10, max=100)
+epsilon <- rnorm(N)
+y <- -2*x + 9.3*u + 5 + rnorm(N, 1, 2)
+# use only the first 8 data points
+# give to subset a vector of index values or logical values 
+full.model <- lm(y~x+u+v, subset=1:8)
+
+## 11.9 Regression formula including expression 
+# you must use the I operator to force R to first evaluate your formula
+# normally, then do the regression 
+N = 10
+x <- 1:N
+u <- runif(N, min=10, max=100)
+epsilon <- rnorm(N)
+y <- -2.2*(x+u) + 5 + rnorm(N, 1, 2)
+summary(lm(y~I(u+v)))
+
+## 11.10 Regression on a polynomial 
+N = 10
+x <- 1:N
+epsilon <- rnorm(N)
+y <- -2.2*x + 1.5*x^2 + 7.1*x^3 + 5 + rnorm(N, 1, 2)
+summary(lm(y~poly(x, 3, raw=TRUE)))
+
+## 11.11 Regression on transformed data
+N = 10
+x <- 1:N
+epsilon <- rnorm(N)
+y <- exp(-2.2*(x) + 5 + rnorm(N, 1, 2))
+summary(lm(log(y)~x))
+
+## 11.12 Finding the best power transformation 
+# use the Box-Cox procedure that identifies l such as transforming 
+# y into y^l improves the model 
+N = 100
+x <- 1:N
+epsilon <- rnorm(N)
+y <- (x+rnorm(N))^(-1/1.5)
+# a. fit an usual model 
+m <- lm(y~x)
+# b. plot residuals against fitted values, see if they look fine  
+plot(fitted(m), residuals(m))
+# c. use boxcox to find lambda 
+library(MASS)
+bc<-boxcox(m)
+lambda<-bc$x[which.max(bc$y)]
+# d. Redo the regression model with the given transformation 
+m <- lm(I(y^lambda)~x)
+plot(fitted(m), residuals(m))
+
+## 11.13 Confidence intervals for regression coefficients 
+N = 100
+x <- 1:N
+epsilon <- rnorm(N)
+y <- 2*x+1+rnorm(N)
+m <- lm(y~x)
+confint(m, level=0.99)
+
+## 11.14 Plotting Regression Residuals 
+N = 100
+x <- 1:N
+epsilon <- rnorm(N)
+y <- 2*x+1+rnorm(N)
+m <- lm(y~x)
+plot(m, which=1)
+
+## 11.15 Diagnosing a linear regression 
+N = 100
+x <- 1:N
+epsilon <- rnorm(N)
+y <- 2*x+1+rnorm(N, sd=10)
+m <- lm(y~x)
+# a. Check that the F-statistic is significant 
+summary(m)
+# b. Check the different diagnostic plots:
+# - the residuals vs fitted should be randomly scattered 
+# - the residuals follow a normal distribution (Normal Q-Q plot on the line)
+# - in Scale-location and Residuals vs Leverage the points are in a group with 
+# none to far from the center 
+plot(m)
+# c. Check for outliers 
+install.packages("car")
+library(car)
+outlierTest(m)
+
+## 11.16 Identify influential observations 
+# used to identify potentially problematic data points
+N = 100
+x <- 1:N
+epsilon <- rnorm(N)
+y <- 2*x+1+rnorm(N, sd=10)
+m <- lm(y~x)
+# the significant observations are marked with an (*)
+influence.measures(m)
+
+## 11.17 Test residuals for autocorrelation 
+# presence of autocorrelation indicates missing predictor or 
+# that one should include a time series component 
+# use the Durbin-Watson test
+N = 100
+x <- 1:N
+epsilon <- rnorm(N)
+y <- 2*x+1+rnorm(N, sd=10)
+m <- lm(y~x)
+#install.packages("lmtest")
+library(lmtest)
+dwtest(m)
+
+## 11.18 Predicting new values 
+N = 100
+x <- 1:N
+epsilon <- rnorm(N)
+y <- 2*x+1+rnorm(N, sd=10)
+m <- lm(y~x)
+x.new <- data.frame(x=120:150)
+predictions <- predict(m, newdata=x.new)
+plot(y~x, ylim=range(c(y, predictions)), xlim=range(c(x, x.new)))
+points(x.new$x, predictions, col="blue")
+
+## 11.19 Forming prediction intervals
+# ! predictions intervals are extremely sensitive to deviations from normality 
+# if your data may not be normal use a non-parametric method such as bootstrapping 
+N = 100
+x <- 1:N
+epsilon <- rnorm(N)
+y <- 2*x+1+rnorm(N, sd=10)
+m <- lm(y~x)
+x.new <- data.frame(x=120:150)
+predictions <- predict(m, newdata=x.new, interval="prediction")
+predictions
+
+## 11.20 One-way ANOVA 
+# Having several groups that are normally distributed, this is used to 
+# find out if the means are different between the groups 
+g1 <- rnorm(20, 0, 2)
+g2 <- rnorm(20, 3, 2)
+g3 <- rnorm(20, 2, 3)
+data <- stack(list(A=g1, B=g2, C=g3))
+# low pvalue indicates that two or more groups likely have different means 
+anova.res <- oneway.test(data$values ~ data$ind)
+# or
+m<-aov(data$values ~ data$ind)
+summary(m)
+
+## 11.21 Creating an interaction plot 
+# Multi-way ANOVA: several factors 
+# check for interaction between predictions 
+#install.packages("faraway")
+library(faraway)
+data(rats)
+interaction.plot(rats$poison, rats$treat, rats$time)
+
+## 11.22 Finding differences between means of groups 
+# after ANOVA indicated significant differences in means, find out 
+# the differences between those means for all groups 
+g1 <- rnorm(20, 0, 2)
+g2 <- rnorm(20, 3, 2)
+g3 <- rnorm(20, 2, 3)
+data <- stack(list(A=g1, B=g2, C=g3))
+m<-aov(data$values ~ data$ind)
+thsd<-TukeyHSD(m)
+plot(thsd)
+
+## 11.23 Performing robust ANOVA (Kruskal-Wallis test)
+# data divided in groups that do not have a normal distribution but they have a
+# similar shape 
+# Null hypothesis: all groups have the same median 
+x<-1:10
+g1 <- (x+3)^1/5 + rnorm(10)
+g2 <- (x+2)^1/2 + rnorm(10)
+g3 <- (x+3)^1/5 + rnorm(10)
+data <- stack(list(A=g1, B=g2, C=g3))
+m<-kruskal.test(data$values ~ data$ind)
+
+## 11.24 Compare models by using ANOVA 
+# !One model must be contained into the other one!
+N = 100
+x <- 1:N
+v <- 10:(N+9)
+epsilon <- rnorm(N)
+y <- 2*x+1+rnorm(N, sd=10)
+m1 <- lm(y~x)
+m2 <- lm(y~x+v)
+# compare the models 
+anova(m1, m2)
 
