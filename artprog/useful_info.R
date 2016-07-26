@@ -46,6 +46,27 @@ x <- 1:10
 which(x > 3)
 
 
+## 3. Matrices and arrays 
+# matrices are vectors with two attributes: number of rows and number of columns 
+# matrices are stored in column-major order
+# example: generate a covariance matrix of size n with correlation rho between variables
+makecov <- function(n, rho) {
+  res <- matrix(nrow=n, ncol=n)
+  res <- ifelse(row(res) == col(res), 1, rho)
+  return(res)
+}
+makecov(3, 0.7)
+# matrix has an attribute called dim
+x <- matrix(1:8,nrow=4)
+class(x)
+attributes(x)
+# to avoid reducing the dimension of the matrix, you can use the drop argument at slicing 
+
+
+
+
+
+
 
 
 
