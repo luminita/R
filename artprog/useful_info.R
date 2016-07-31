@@ -102,10 +102,29 @@ d[,2]
 # return a data frame
 d[,2, drop=F]
 # you can do joins between data frames using merge 
-kids<-c("kubulita", "kub", "kub2")
-ages<-c(-1.0, 1.0, 0.1)
-d2<-data.frame(kids, ages)
-d3<-merge(d, d2)
+children<-c("kubulita", "kub", "kub2")
+smartness<-c(10, 9, 10)
+d2<-data.frame(children, smartness)
+d3<-merge(d, d2, by.x="kids", by.y="children")
 d3
+# how to sort a data frame
+indices<-order(d3$ages)
+d3[indices,]
 
+
+## 6. Factors and tables 
+# factors are vectors that include levels
+fa<-factor(c(11,2,11))
+fa
+# one can use tapply with factors 
+ages<-factor(c("young", "young", "old", "young"))
+affil<-factor(c("S", "S", "S", "M"))
+income<-c(10, 20, 50, 15)
+tapply(income, list(ages, affil), mean)
+# get the indices where certain factor values appear
+x<-factor(c(1, 2, 3, 1, 2, 3))
+split(1:length(x), x)
+# table creates contingency tables; there are special functions 
+# that can be used on such tables eg dimnames 
+table(affil, ages)
 
