@@ -91,5 +91,21 @@ indices<-lapply(list(F="F", M="M"), function(gender) which(g==gender))
 indices
 
 
+## 5. Data frames 
+kids<-c("kub", "kub2")
+ages<-c(1.0, 0.1)
+d<-data.frame(kids, ages)
+d
+# one can use both list and matrix notation for data frames 
+d$kids
+d[,2]
+# return a data frame
+d[,2, drop=F]
+# you can do joins between data frames using merge 
+kids<-c("kubulita", "kub", "kub2")
+ages<-c(-1.0, 1.0, 0.1)
+d2<-data.frame(kids, ages)
+d3<-merge(d, d2)
+d3
 
 
