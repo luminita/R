@@ -8,3 +8,5 @@ x>y # this is vectorized
 # Note 2: ifelse if vectorized!
 
 ## cbind and rbind are often not efficient (it recreated the matrix)
+
+##

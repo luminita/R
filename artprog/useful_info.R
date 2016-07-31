@@ -62,10 +62,33 @@ class(x)
 attributes(x)
 # to avoid reducing the dimension of the matrix, you can use the drop argument at slicing 
 
-
-
-
-
+## 4. Lists 
+# lists are equivalent of python dictionaries 
+# how to access elements in a list 
+x<-list(name="John", salary=30000, union=T)
+x$name
+x[["name"]]
+x[[1]]
+# ! If single brackets are used, then the result is another list! -> you can do slicing 
+x[1]
+# to delete an element just make it NULL
+x$union<-NULL
+x
+# lapply applies a function to each of the components of a list and returns a list 
+# sapply simplifies the result to a vector or a matrix 
+x<-list(1:10, 1:20)
+lapply(x, median)
+sapply(x, median)
+# you can index using a vector 
+x<-list(name="John", salary=30000, union=T)
+x[c("name", "salary")]
+# order returns the indices of a sorted vector wrt the original vector 
+y<-c(7, 1, 9)
+order(y)
+# interesting example of using lapply: at which positions in a vector different letters appear
+g<-c("F", "M", "M", "F", "F")
+indices<-lapply(list(F="F", M="M"), function(gender) which(g==gender))
+indices
 
 
 
