@@ -45,7 +45,6 @@ x
 x <- 1:10
 which(x > 3)
 
-
 ## 3. Matrices and arrays 
 # matrices are vectors with two attributes: number of rows and number of columns 
 # matrices are stored in column-major order
@@ -56,10 +55,12 @@ makecov <- function(n, rho) {
   return(res)
 }
 makecov(3, 0.7)
+
 # matrix has an attribute called dim
 x <- matrix(1:8,nrow=4)
 class(x)
 attributes(x)
+
 # to avoid reducing the dimension of the matrix, you can use the drop argument at slicing 
 
 ## 4. Lists 
@@ -67,46 +68,55 @@ attributes(x)
 # how to access elements in a list 
 x<-list(name="John", salary=30000, union=T)
 x$name
+
 x[["name"]]
 x[[1]]
+
 # ! If single brackets are used, then the result is another list! -> you can do slicing 
 x[1]
+
 # to delete an element just make it NULL
 x$union<-NULL
 x
+
 # lapply applies a function to each of the components of a list and returns a list 
 # sapply simplifies the result to a vector or a matrix 
 x<-list(1:10, 1:20)
 lapply(x, median)
 sapply(x, median)
+
 # you can index using a vector 
 x<-list(name="John", salary=30000, union=T)
 x[c("name", "salary")]
+
 # order returns the indices of a sorted vector wrt the original vector 
 y<-c(7, 1, 9)
 order(y)
+
 # interesting example of using lapply: at which positions in a vector different letters appear
 g<-c("F", "M", "M", "F", "F")
 indices<-lapply(list(F="F", M="M"), function(gender) which(g==gender))
 indices
-
 
 ## 5. Data frames 
 kids<-c("kub", "kub2")
 ages<-c(1.0, 0.1)
 d<-data.frame(kids, ages)
 d
+
 # one can use both list and matrix notation for data frames 
 d$kids
 d[,2]
 # return a data frame
 d[,2, drop=F]
+
 # you can do joins between data frames using merge 
 children<-c("kubulita", "kub", "kub2")
 smartness<-c(10, 9, 10)
 d2<-data.frame(children, smartness)
 d3<-merge(d, d2, by.x="kids", by.y="children")
 d3
+
 # how to sort a data frame
 indices<-order(d3$ages)
 d3[indices,]
@@ -127,4 +137,61 @@ split(1:length(x), x)
 # table creates contingency tables; there are special functions 
 # that can be used on such tables eg dimnames 
 table(affil, ages)
+
+
+## 7. R programming structures 
+# to loop over nonvectors 
+u<-matrix(c(1,2,3,1,2,4), ncol=2)
+v<-matrix(c(8,12,20,15,10,2), ncol=2)
+for(m in c("u", "v")) {
+  z<-get(m)
+  print(lm(z[,2] ~ z[,1]))
+}
+# if else structures return the last value assigned 
+x<-2
+y<-if (x==2) x else x+1
+# super assignment operator to write to variables at "upper" levels
+x<-1
+f<-function(a) {
+  x<<-a*a
+}
+f(2)
+x
+# closure: function that creates a local variable and then creates another function 
+# that accesses that variable
+counter<-function() {
+  i<-0
+  f<-function() {
+    i<<-i+1
+    cat("this counter has value", i, "\n")
+  }
+  return(f)
+}
+c1<-counter()
+c2<-counter()
+c1()
+c1()
+c2()
+c1()
+c2()
+# quicksort
+qs<-function(x) {
+  if(length(x) <= 1) return(x)
+  pivot<-x[1]
+  left<-x[x<=pivot][-1]
+  right<-x[x>pivot]
+  return(c(qs(left), pivot, qs(right)))
+}
+# replacement functions: any assignment statement where the left side is not 
+# an identifier
+# what exactly happens below is x<-"names<-"(x, value=c("a", "b", "ab"))
+x<-c(1,2,3)
+names(x)<-c("one", "two", "three")
+# write your pwn binary operator by writing a function starting and ending wth %%
+"%ab%"<-function(a,b) return(a*b)
+2 %ab% 4
+
+
+
+
 

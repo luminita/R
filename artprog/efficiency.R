@@ -7,6 +7,6 @@ x>y # this is vectorized
 # Note 1: R functions that use vectorized operations are also vectorized!
 # Note 2: ifelse if vectorized!
 
-## cbind and rbind are often not efficient (it recreated the matrix)
+## cbind and rbind are often not efficient (it recreates the matrix)
 
 ##
