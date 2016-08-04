@@ -192,6 +192,26 @@ names(x)<-c("one", "two", "three")
 2 %ab% 4
 
 
-
-
-
+## 8. Doing math and simulations in R
+# min and pmin (pmin does a zip of the arguments, and then the min of each group)
+x<-matrix(c(1,5,6,2,4,2, -1, 10, -2), ncol=3)
+min(x[,1], x[,2], x[,3])
+pmin(x[,1], x[,2], x[,3])
+# function minimization, maximization 
+f<-function(x) return(x^2-sin(x))
+nlm(f, 1)
+# differentiation
+D(expression(x^2), "x")
+f<-function(x) return(x^2-sin(x))
+integrate(f,0,1)
+# statistics prefixes: d gives density, p gives cumulative function, q quantiles 
+# r random numbers 
+# how to sort data frames
+d<-data.frame(v1=c(2,7,5), v2=c("a", "c", "b"))
+sorted_d<-d[order(d$v1),]
+# solve system of equations 
+a<-matrix(c(1,1,-1,1), nrow=2)
+b<-c(2,4)
+solve(a, b)
+# compute the inverse of a matrix
+solve(a)
